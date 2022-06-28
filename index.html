@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>demo</title>
+		<link rel="stylesheet" type="text/css" href="js/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="js/layui/lay/treetable-lay/treetable.css"/>
+		<style>
+		.text-right{ text-align: right;}
+		</style>
+	</head>
+	<body>
+		<div class="layui-layout-admin">
+			<br />
+			<div class="layui-container">
+			<form class="layui-form layui-form-pane">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<input type="radio" name="theme" title="院区主题" value="院区主题"/>
+						<input type="radio" name="theme" title="科室主题" value="科室主题"/>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">选择当期</label>
+						<div class="layui-input-inline">
+							<input type="text" name="dqdate" class="layui-input setDate" />
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">选择上期</label>
+						<div class="layui-input-inline">
+							<input type="text" name="dqdate" class="layui-input setDate" />
+						</div>
+					</div>
+					</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">选择同期</label>
+						<div class="layui-input-inline">
+							<input type="text" name="dqdate" class="layui-input setDate" />
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">科室</label>
+						<div class="layui-input-inline">
+							<div id="Deparm" class="xm-search"></div>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<button type="button" class="layui-btn layui-btn-sm layui-btn-normal">查询</button>
+					</div>
+				</div>
+			</form>
+			<!-- 内容表格部分 -->
+			<div class="body">
+				<div class="layui-row">
+					<div class="layui-col-md6">
+						<div class="text-left">
+							<button id="allexpand" type="button" class="layui-btn layui-btn-xs layui-btn-primary">展开/收起</button>
+						</div>
+					</div>
+					<div class="layui-col-md6">
+						<div class="text-right">
+							<button type="button" class="layui-btn layui-btn-xs layui-btn-primary" title="设置"><i class="layui-icon layui-icon-set-fill"></i></button>
+							<button type="button" class="layui-btn layui-btn-xs layui-btn-primary" title="导出"><i class="layui-icon layui-icon-export"></i></button>
+						</div>
+					</div>
+				</div>
+				<div class="layui-row treeTable">
+					<table class="layui-hide" id = "tables" lay-filter="tables"></table>
+				</div>
+			</div>
+			
+			
+		</div></div>
+		<script src="js/jquery-3.2.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/xm-select.js" type="text/javascript" charset="utf-8"></script>
+		
+		
+		
+		<script type="text/javascript">
+			dataAll = [{"id":1,"name":"系统设置","url":"","icon":"","idx":1,"parentId":0},{"id":2,"name":"角色管理","url":"","icon":"","idx":1,"parentId":1},{"id":6,"name":"数据表格","url":"","icon":"","idx":1,"parentId":5},{"id":3,"name":"部门管理","url":"","icon":"","idx":2,"parentId":1},{"id":5,"name":"表格案例","url":"","icon":"","idx":2,"parentId":0},{"id":7,"name":"树形表格","url":"","icon":"","idx":2,"parentId":5},{"id":12,"name":"三级","url":"","icon":"","idx":3,"parentId":7},{"id":12,"name":"三级","url":"","icon":"","idx":3,"parentId":7}];
+		 
+			layui.use(['jquery','form','table','treeGrid','layer','laydate'],function(){
+				var $ = layui.jquery , form = layui.form , treeGrid = layui.treeGrid;
+				var table = layui.table;
+				var layer = layui.layer;
+				var laydate = layui.laydate;
+				var treetableobj = null;
+				
+				lay('.setDate').each(function(i,item){
+					laydate.render({
+						elem : this,
+						range: '~',
+						trigger: 'click'
+					})
+				})
+				
+				//渲染表格
+				var treeObj = treeGrid.render({
+								elem: '#tables' //传入元素选择器 
+							//,url:'/data2.json'
+							, data: [ {
+				                "id": "all", "name": "全院",  "pId": 0, /*父级id 0=根元素*/
+				                "mjz": "420000", "mz" : 0, 	"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0
+				            },
+										{
+				                "id": "headquarters", "name": "本部", "pId": "all",
+				                "mjz": "200000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+				                "id": "huxihead", "name": "呼吸中心", "pId": "headquarters",
+				                "mjz": "80000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+				               "id": "huxi1", "name": "呼吸一科", "pId": "huxihead",
+				               "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+				                "id": "huxi2", "name": "呼吸二科", "pId": "huxihead",
+				                "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+											"id": "huxi3", "name": "呼吸靖西", "pId": "huxihead",
+				              "mjz": "20000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },{
+											"id": "guke", "name": "骨科中心", "pId": "headquarters",
+				              "mjz": "","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },{
+											"id": "west", "name": "西区", "pId": "all",
+				              "mjz": "120000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+										    "id": "xqhuxihead", "name": "呼吸中心", "pId": "west",
+										    "mjz": "80000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+										   "id": "xhuxi1", "name": "呼吸一科", "pId": "xqhuxihead",
+										   "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+										    "id": "xhuxi2", "name": "呼吸二科", "pId": "xqhuxihead",
+										    "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+											"id": "xguke", "name": "骨科中心", "pId": "west",
+										  "mjz": "","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+											"id": "east_side", "name": "东区", "pId": "all",
+				              "mjz": "100000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+				            },
+										{
+										    "id": "dqhuxihead", "name": "呼吸中心", "pId": "east_side",
+										    "mjz": "80000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+										   "id": "dhuxi1", "name": "呼吸一科", "pId": "dqhuxihead",
+										   "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+										    "id": "dhuxi2", "name": "呼吸二科", "pId": "dqhuxihead",
+										    "mjz": "30000","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+										{
+											"id": "dguke", "name": "骨科中心", "pId": "east_side",
+										  "mjz": "","mz" : 0,"jz" : 0, "yb" : 0, "fyb" : 0, "zsr" : 0,
+										},
+				        ]
+							,cellMinWidth: 100
+							,treeId:'id'//树形id字段名称
+							,treeUpId:'pId'//树形父id字段名称
+							,treeShowName:'name'//以树形式显示的字段
+							 
+							,cols: [[
+									{type:'checkbox'}
+									,{field:'name', title: '科室',/*edit:'text',*/}
+									,{field:'mjz',title: '门急诊人次',sort:true,templet: function(d){
+											return d.mjz;
+									}}
+									,{field:'mz', title: '门诊人次',sort:true}
+									,{field:'jz', title: '急诊人次',sort:true}
+									,{field:'yb', title: '医保人次',sort:true}
+									,{field:'fyb', title: '非医保人次',sort:true}
+									,{field:'zsr', title: '总收入',sort:true}
+									
+									,{width:100,title: '操作', align:'center', /*toolbar: '#barDemo'*/
+											hide: true ,templet: function(d){
+											var html='';
+											var addBtn='<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add">添加</a>';
+											var delBtn='<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+											return addBtn+delBtn;
+									}
+									}
+									
+							]]
+							,page:false,
+							callback: {
+									beforeCheck : treetableBeforeCheck,
+									onCheck : treetableOnCheck,
+									beforeCollapse : treetableBeforeCollapse,
+									onCollapse : treetableOnCollapse,
+									beforeExpand : treetableBeforeExpand,
+									onExpand : treetableOnExpand,
+							}
+				});
+				
+				//console.log( treeObj.config.callback.onCheck())
+				function treetableBeforeCheck(node){
+				    alert("回调方法treetableBeforeCheck");
+				    return true;
+				};
+				function treetableOnCheck(node){
+				    alert("回调方法treetableOnCheck");
+				};
+				function treetableBeforeCollapse(){
+				    alert("回调方法treetableBeforeCollapse");
+				    return true;
+				};
+				function treetableOnCollapse(){
+				    alert("回调方法treetableOnCollapse");
+				};
+				function treetableBeforeExpand(){
+				    alert("回调方法treetableBeforeExpand");
+				    return true;
+				};
+				function treetableOnExpand(){
+				    alert("回调方法treetableOnExpand");
+				};
+				
+				$('#allexpand').click(function(){
+					$('.treeTable').find('.layui-tree-head').click()
+				})
+			})
+		</script>
+		<script type="text/javascript">
+		 	xmSelect.render({
+				  el: "#Deparm",
+					clickClose: true,       //单选完关闭下拉框
+					filterable: true,       //搜索
+					direction: 'down',      // 展开方向 下
+					//radio: true,            //单选
+					tree: {
+						//是否显示树状结构
+						show: true,
+						//是否展示三角图标
+						showFolderIcon: true,
+						//是否显示虚线
+						showLine: false,
+						//间距
+						indent: 20,
+						//默认展开节点的数组, 为 true 时, 展开所有节点
+						expandedKeys: [], 
+						//是否严格遵守父子模式
+						strict: true,
+						//是否开启极简模式
+						simple: true,
+						//点击节点是否展开
+						clickExpand: true,
+						//点击节点是否选中
+						clickCheck: true,
+					},
+					height: "200px",
+					data:function(){
+							return [
+								{name: '销售员', value: -1,  children: [
+									{name: '张三1', value: 1, selected: true, children: []},
+									{name: '李四1', value: 2, selected: true},
+									{name: '王五1', value: 3, disabled: true},
+								]},
+								{name: '奖品', value: -2, children: [
+									{name: '奖品3', value: -3, children: [
+										{name: '苹果3', value: 14, selected: true},
+										{name: '香蕉3', value: 15},
+										{name: '葡萄3', value: 16},
+									]},
+									{name: '苹果2', value: 4, selected: true, disabled: false},
+									{name: '香蕉2', value: 5},
+									{name: '葡萄2', value: 6},
+								]},
+							]
+						},
+					model: {
+							label: {type: 'text'}
+							//, icon: 'hidden'
+					},  //文本显示模式
+					//处理方式
+					on: function (data) {
+							// if (data.isAdd) {
+							// 		return data.change.slice(0, 1)
+							// }
+					}, 
+			})
+		</script>
+		
+		<script type="text/html" id="toolbarDemo">
+			<div class="layui-btn-group">
+				<button class="layui-btn layui-btn-sm" lay-event="add_lay"><i class="layui-icon">&#xe654;</i>新增</button>
+		    	<button class="layui-btn layui-btn-sm" lay-event="updata_lay"><i class="layui-icon">&#xe642;</i>修改</button>
+		    	<button class="layui-btn layui-btn-sm" lay-event="delete_lay"><i class="layui-icon">&#xe640;</i>删除</button>
+		    	<button class="layui-btn layui-btn-sm" lay-event="refresh_lay"><i class="layui-icon">&#xe666;</i>刷新</button>
+		  	</div>
+		</script>
+	</body>
+</html>
